@@ -67,6 +67,19 @@ function FirstView() {
 		borderWidth: 3
 	});
 	
+	function checkIDidIt(current_index) {
+		if (insights[current_index].hasOwnProperty('did')) {
+			iDidItButton.color = "#0D0";
+			iDidItButton.title = "\u2714";
+			iDidItButton.font = {fontSize:50};
+		} else {
+			iDidItButton.color = '#555';
+			iDidItButton.font = {fontFamily:'Arial',fontWeight:'bold',fontSize:22};
+			iDidItButton.title = 'I did this!';
+		}
+	}
+	
+	
 	if (Ti.Platform.osname == 'android') {
 		iDidItButton.font = {fontFamily:'Arial',fontWeight:'bold',fontSize:22};
 	} else {
@@ -137,9 +150,10 @@ function FirstView() {
 		if ((index.currentPage) == (current_day.getDOY() % insights.length)) {
 			self.add(todaysGood);
 		} else {
-			self.remove(todaysGood); 
+			self.remove(todaysGood);
 		}
 		
+		checkIDidIt(index.currentPage);
 		count.text = "#" + index.currentPage;
 	});
 	
@@ -177,11 +191,7 @@ function FirstView() {
 			}
 		});
 	});
-	
-	
-	
-	
-	
+		
 	
 	function sendGood()  {
 		 var url = "http://198.61.167.217:8282";
@@ -236,36 +246,22 @@ function FirstView() {
 	
 	getGoods();
 	
-	function toggleIDidIt() {
-		if (insights[current_index].hasOwnProperty('did')) {
-			iDidItButton.fireEvent('click');
-		} else {
-			iDidItButton.color = '#555';
-			iDidItButton.font = {fontFamily:'Arial',fontWeight:'bold',fontSize:22};
-			iDidItButton.title = 'I did this!';
-		}
-		
-		if (current_index == (current_day.getDOY() % insights.length)) {
-			self.add(todaysGood);
-		} else {
-			self.remove(todaysGood); 
-		}
-		
-
-	}
-	
-	
 
 	iDidItButton.addEventListener('click', function(){
 		iDidItButton.color = "#0D0";
 		iDidItButton.title = "\u2714";
 		iDidItButton.font = {fontSize:50};
-		if (!insights[current_index].hasOwnProperty('did')) {
-			insights[current_index].did = true;
+		if (!insights[scrollView.currentPage].hasOwnProperty('did')) {
+			insights[scrollView.currentPage].did = true;
 			sendGood();
+			goodCount.text = "+1!";
+			setTimeout(function(){
+    			getGoods();
+			}, 1000);
+	
 		}
 		
-		Ti.App.Properties.setList('insights', insights);
+	//Ti.App.Properties.setList('insights', insights);
 		
 	});
 	
